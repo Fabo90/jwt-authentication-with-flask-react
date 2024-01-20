@@ -43,7 +43,7 @@ def login_user():
     password_exist = User.query.filter_by(password=password).first()
 
     if user_exist and password_exist:
-        access_token = create_access_token(identity=password)
+        access_token = create_access_token(identity=user_name)
         return jsonify({"token": access_token}), 200
     else:
         return jsonify({"msg": "Incorrect user or password"}), 401
@@ -51,8 +51,8 @@ def login_user():
 @api.route('/private')
 @jwt_required()
 def private_access():
-    password = get_jwt_identity()
-    return jsonify({"your password is": password}), 200 
+    user_name = get_jwt_identity()
+    return jsonify({"your user is": user_name}), 200 
 
 
 
