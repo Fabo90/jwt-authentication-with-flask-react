@@ -16,7 +16,7 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 
-@api.route('/signup', methods=['POST', 'GET'])
+@api.route('/signup', methods=['POST'])
 def create_user():
     email = request.json.get('email')
     user_name = request.json.get('user_name')
@@ -35,16 +35,15 @@ def create_user():
         db.session.commit()
         return jsonify({"msg":"User created succesfully"}), 200
     
-@api.route('/login', methods=['GET'])
+@api.route('/login', methods=['POST'])
 def login_user():
     user_name = request.json.get('user_name')
     password = request.json.get('password')
-    user_exist = User.query.filter_by(user_name=user_name).first()
-    password_exist = User.query.filter_by(password=password).first()
+    user_exist = User.query.filter_by(user_name=user_name, password=password).first()
 
-    if user_exist and password_exist:
+    if user_exist:
         access_token = create_access_token(identity=user_name)
-        return jsonify({"token": access_token}), 200
+        return jsonify(access_token=access_token), 200
     else:
         return jsonify({"msg": "Incorrect user or password"}), 401
     

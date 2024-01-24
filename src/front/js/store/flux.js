@@ -13,7 +13,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			loggedIn: false,
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -46,7 +47,69 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
-			}
+			},
+			postSignUp: async (user, email, password) => {
+				let newUser = {
+					email: email,
+					user_name: user,
+					password: password
+				};
+				try {
+					const response = await fetch(process.env.BACKEND_URL + '/api/signup', {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(newUser)
+					});
+					const json = await response.json();
+
+					if (!response.ok) {
+						console.log(response.statusText);
+						return alert('User name or email already registered, please go back and try again');
+					}
+
+					console.log(json);
+					
+				} catch (error) {
+					console.log(error);
+				}
+			},
+			postLogin: async (user, password) => {
+				let data = {
+					user_name: user,
+					password: password
+				};
+				try {
+					const response = await fetch(process.env.BACKEND_URL + '/api/login', {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(data)
+					});
+					const json = await response.json();
+
+					if (!response.ok) {
+						console.log(response.statusText);
+						return alert('Wrong user or password');
+					}
+					getActions().tokenLogin(json.access_token)
+					console.log(json);
+					console.log('success');
+					
+				} catch (error) {
+					console.log(error);
+				}
+			},
+			tokenLogin: (token) =>{
+				setStore({loggedIn: true});
+				localStorage.setItem("token", token);
+			},
+			tokenLogout: () =>{
+				setStore({loggedIn: false});
+				localStorage.removeItem("token")
+			},
 		}
 	};
 };
