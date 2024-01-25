@@ -47,11 +47,14 @@ def login_user():
     else:
         return jsonify({"msg": "Incorrect user or password"}), 401
     
-@api.route('/private')
+@api.route('/private', methods=['GET'])
 @jwt_required()
 def private_access():
-    user_name = get_jwt_identity()
-    return jsonify({"your user is": user_name}), 200 
+    user = get_jwt_identity()
+    if not user:
+        return jsonify({"msg": "access denied"}), 401
+    return jsonify(user), 200
+   
 
 
 

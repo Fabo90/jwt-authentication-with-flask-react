@@ -12,7 +12,6 @@ import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 
-import { Navbar } from "./component/navbar";
 
 //create your first component
 const Layout = () => {

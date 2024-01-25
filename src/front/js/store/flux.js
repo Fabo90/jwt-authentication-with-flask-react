@@ -1,20 +1,9 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			],
+			userName: null,
 			loggedIn: false,
+			token: null,
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -94,10 +83,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.log(response.statusText);
 						return alert('Wrong user or password');
 					}
-					getActions().tokenLogin(json.access_token)
-					console.log(json);
-					console.log('success');
-					
+
+					getActions().tokenLogin(json.access_token);
+					setStore({ token: json.access_token});
+
 				} catch (error) {
 					console.log(error);
 				}
@@ -108,7 +97,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			tokenLogout: () =>{
 				setStore({loggedIn: false});
-				localStorage.removeItem("token")
+				localStorage.removeItem("token");
+				setStore({ token: null, userName: null});
+			},
+			getInfo: async () => {
+				try {
+					const store = getStore();
+					const response = await fetch(process.env.BACKEND_URL + '/api/private', {
+						headers: {
+							"Authorization": "Bearer " + store.token
+						},
+						
+					});
+					const json = await response.json();
+
+					if (!response.ok) {
+						console.log(response.statusText);
+						return;
+					}
+
+					setStore({ message: json});
+					
+				} catch (error) {
+					console.log(error);
+				}
 			},
 		}
 	};

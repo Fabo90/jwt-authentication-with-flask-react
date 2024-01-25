@@ -1,28 +1,32 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Private = () => {
 	const { store, actions } = useContext(Context);
+    const navigate = useNavigate()
+    const handleOnClick = () => actions.tokenLogout();
 
-	return ( 
-        <div className="text-center justify-content-center d-md-flex m-5"> 
-            <div className="card">
-                <div className="card-header fs-1">
-                    Personal Information
+    useEffect(() => {
+		actions.getInfo();
+		}, [store.token])
+
+    return (
+    <div>
+      {store.loggedIn ? (<div className="text-center justify-content-center d-md-flex m-5"> 
+                <div className="card">
+                    <div className="card-header fs-1">
+                        Personal Information
+                    </div>
+                    <div className="card-body">
+                        <h5 className="card-title">your user name is:</h5>
+                        <p className="card-text fs-3 fw-bold">{store.message}</p>
+                        <div>
+                            <button className="btn btn-primary btn-lg" onClick={handleOnClick}>Log out</button>
+                        </div>
+                    </div>
                 </div>
-                <div className="card-body">
-                    <h5 className="card-title fw-bold">User</h5>
-                    <p className="card-text">random user</p>
-                    <h5 className="card-title fw-bold">Email</h5>
-                    <p className="card-text">random email</p>
-                    <div>
-					    <Link to="/">
-						    <button className="btn btn-primary btn-lg">Log out</button>
-					    </Link>
-				    </div>
-                </div>
-            </div>
-        </div>
-    )
+            </div>): (navigate("/login"))}
+    </div>    
+	);
 }
